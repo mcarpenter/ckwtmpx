@@ -1,0 +1,198 @@
+
+
+
+User Commands                                          ckwtmpx(1)
+
+
+
+NAME
+     ckwtmpx - check Solaris wtmpx files for corruption, and per-
+     form optional repairs.
+
+
+SYNOPSIS
+     ckwtmpx [-d] [-o output_file] [-e error_file] [-t time_travel]
+     ckwtmpx -h
+     ckwtmpx -v
+
+
+DESCRIPTION
+     It sometimes happens, either malevolently or otherwise, that
+     Solaris'   binary   format  accounting  file  /var/adm/wtmpx
+     becomes corrupted. The only normal symptom of this  is  that
+     standard tools such as last stop processing the file as soon
+     as the corrupt data is encountered (last produces neither an
+     error message nor a non-zero return code).
+
+
+     ckwtmpx attempts to read a wtmpx file  from  standard  input
+     one  record  at  a  time.  Valid  records  are copied to the
+     (optional) output file (-o), and bytes  that  are  discarded
+     are copied to the (optional) error file (-e).
+
+
+     When an invalid record is encountered, ckwtmpx moves forward
+     through the standard input one character at a time until the
+     start of a valid record is found. Skipped bytes are  written
+     to  the  error  file as they are discarded. Errors and debug
+     information are sent to stderr.
+
+
+     A valid record fulfills the following criteria:
+
+         Epoch time (ut_tv) is greater than 0 (was written  after
+         1 Jan 1970).
+
+         Epoch time (ut_tv) is before now (was not written in the
+         future).
+
+         The wtmpx record type (ut_type) is valid.
+
+         Either this is the first valid record found or it is not
+         more  than  70  seconds younger than the previous record
+         found. (Some systems may buffer output to wtmpx  result-
+         ing occasional temporal misordering of records).
+
+     See <utmpx.h> and <utmp.h> for more details  on  the  binary
+     record  format, in particular struct futmpx in <utmpx.h> for
+     details of the record serialization.
+
+
+
+
+SunOS 5.10          Last change: 14 Apr 2010                    1
+
+
+
+
+
+
+User Commands                                          ckwtmpx(1)
+
+
+
+OPTIONS
+     Flags -d, -e and -o may be combined  as  required  but  note
+     that
+
+         ckwtmpx -o /var/adm/wtmpx </var/adm/wtmpx
+
+     will almost certainly cause pain. Use a temporary file.
+
+     The following options are supported:
+
+     -d                       Enable debug output to stderr.
+
+
+     -h                       Print usage to stdout and exit.
+
+
+     -e error_file            Writes  skipped  bytes   from   the
+                              corrected wtmpx file to error_file.
+
+
+     -o output_file           Writes the corrected wtmpx file  to
+                              output_file.
+
+
+     -v                       Print version to stdout and exit.
+
+
+RETURN VALUE
+     Returns 0 if the wtmpx file is okay, non-zero otherwise,  so
+     ckwtmpx  can be run with no arguments for testing file vali-
+     dity without spurious output:
+
+         if ! ckwtmpx </var/adm/wtmpx
+
+
+
+EXAMPLES
+         ckwtmpx -e /tmp/err -o /tmp/out </var/adm/wtmpx
+
+     Writes corrected binary file to /tmp/out and  skipped  bytes
+     to /tmp/err.
+
+         ckwtmpx -d </var/adm/wtmpx
+
+     Writes  debug  information  (details  of  each  record   and
+     skip/seek attempts) to stderr.
+
+
+AUTHOR
+     Martin Carpenter, mcarpenter@free.fr, Copyright 2010.
+
+
+
+
+
+SunOS 5.10          Last change: 14 Apr 2010                    2
+
+
+
+
+
+
+User Commands                                          ckwtmpx(1)
+
+
+
+FILES
+     /var/adm/wtmpx    accounting file
+
+
+SEE ALSO
+     last(1), utmpx(4)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SunOS 5.10          Last change: 14 Apr 2010                    3
+
+
+

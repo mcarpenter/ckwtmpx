@@ -1,0 +1,168 @@
+'\" te
+.\" Copyright 2010 Martin Carpenter, mcarpenter@free.fr.
+.TH ckwtmpx 1 "14 Apr 2010" "SunOS 5.10" "User Commands"
+.SH NAME
+ckwtmpx \- check Solaris wtmpx files for corruption, and perform optional repairs.
+
+.SH SYNOPSIS
+.LP
+.nf
+\fBckwtmpx\fR [\fB-d\fR] [\fB-o\fR \fIoutput_file\fR] [\fB-e\fR \fIerror_file\fR] [\fB-t\fR \fItime_travel\fR]
+\fBckwtmpx\fR \fB-h\fR
+\fBckwtmpx\fR \fB-v\fR
+.fi
+
+.SH DESCRIPTION
+.sp
+.LP
+It sometimes happens, either malevolently or otherwise, that Solaris'
+binary format accounting file \fB/var/adm/wtmpx\fR becomes corrupted. The only
+normal symptom of this is that standard tools such as \fBlast\fR stop
+processing the file as soon as the corrupt data is encountered (\fBlast\fR
+produces neither an error message nor a non-zero return code).
+.sp
+.LP
+\fBckwtmpx\fR attempts to read a \fBwtmpx\fR file from standard input one record at
+a time. Valid records are copied to the (optional) output file (\fB-o\fR), and
+bytes that are discarded are copied to the (optional) error file (\fB-e\fR).
+.sp
+.LP
+When an invalid record is encountered, \fBckwtmpx\fR moves forward through
+the standard input one character at a time until the start of a valid
+record is found. Skipped bytes are written to the error file as they are
+discarded. Errors and debug information are sent to stderr.
+.sp
+.LP
+A valid record fulfills the following criteria:
+.sp
+.in +4
+Epoch time (ut_tv) is greater than 0 (was written after 1 Jan 1970).
+.sp
+Epoch time (ut_tv) is before now (was not written in the future).
+.sp
+The \fBwtmpx\fR record type (ut_type) is valid.
+.sp
+Either this is the first valid record found or it is not more than
+70 seconds younger than the previous record found. (Some systems may
+buffer output to \fBwtmpx\fR resulting occasional temporal misordering of records).
+.in -4
+.sp
+See \fB<utmpx.h>\fR and \fB<utmp.h>\fR for more details on the binary record format,
+in particular \fBstruct futmpx\fR in \fB<utmpx.h>\fR for details of the record
+serialization.
+
+.SH OPTIONS
+.sp
+.LP
+Flags \fB-d\fR, \fB-e\fR and \fB-o\fR may be combined as required but note that
+.sp
+.in +4
+ckwtmpx -o /var/adm/wtmpx </var/adm/wtmpx
+.in -4
+.sp
+will almost certainly cause pain. Use a temporary file.
+.sp
+The following options are supported:
+.sp
+.ne 2
+.mk
+.na
+\fB\fB-d\fR\fR
+.ad
+.RS 25n
+.rt  
+Enable debug output to stderr.
+.RE
+
+.sp
+.ne 2
+.mk
+.na
+\fB\fB-h\fR\fR
+.ad
+.RS 25n
+.rt  
+Print usage to stdout and exit.
+.RE
+
+.sp
+.ne 2
+.mk
+.na
+\fB\fB-e\fR \fIerror_file\fR\fR
+.ad
+.RS 25n
+.rt  
+Writes skipped bytes from the corrected \fBwtmpx\fR file to \fIerror_file\fR.
+.RE
+
+.sp
+.ne 2
+.mk
+.na
+\fB\fB-o\fR \fIoutput_file\fR\fR
+.ad
+.RS 25n
+.rt  
+Writes the corrected \fBwtmpx\fR file to \fIoutput_file\fR.
+.RE
+
+.sp
+.ne 2
+.mk
+.na
+\fB\fB-v\fR\fR
+.ad
+.RS 25n
+.rt  
+Print version to stdout and exit.
+.RE
+
+.SH RETURN VALUE
+.sp
+.LP
+Returns 0 if the \fBwtmpx\fR file is okay, non-zero otherwise, so \fBckwtmpx\fR can be run
+with no arguments for testing file validity without spurious output:
+.sp
+.in +4
+if ! ckwtmpx </var/adm/wtmpx
+.in -4
+.sp
+
+.SH EXAMPLES
+.sp
+.in +4
+ckwtmpx -e /tmp/err -o /tmp/out </var/adm/wtmpx
+.in -4
+.sp
+Writes corrected binary file to \fB/tmp/out\fR and skipped bytes to
+\fB/tmp/err\fR.
+.sp
+.in +4
+ckwtmpx -d </var/adm/wtmpx
+.in -4
+.sp
+Writes debug information (details of each record and skip/seek attempts) to stderr.
+
+.SH AUTHOR
+.sp
+.LP
+Martin Carpenter, mcarpenter@free.fr, Copyright 2010.
+
+.SH FILES
+.sp
+.ne 2
+.mk
+.na
+\fB\fB/var/adm/wtmpx\fR\fR
+.ad
+.RS 18n
+.rt  
+accounting file
+.RE
+
+.SH SEE ALSO
+.sp
+.LP
+\fBlast\fR(1), \fButmpx\fR(4)
+
