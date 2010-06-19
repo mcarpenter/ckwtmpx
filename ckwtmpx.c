@@ -28,7 +28,7 @@
 
 #include "ckwtmpx.h"
 
-#define VERSION              "1.2"
+#define VERSION              "1.3"
 #define DEFAULT_TIME_TRAVEL  70 /* seconds */
 #define RECORD_LENGTH        (sizeof(struct futmpx))
 
@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
     char *err_file             = NULL;
     int   byte_no              = 0;
     int   record_no            = 0;
-    int   errors               = 0;
+    int   rc                   = 0;
     int   time_travel          = DEFAULT_TIME_TRAVEL;
     struct futmpx record, last_valid_record;
 
@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
             }
             (void)memcpy(&last_valid_record, &record, RECORD_LENGTH);
         } else {
-            errors++;
+            rc = 1;
             debug("Invalid record encountered at byte %i, seeking\n", byte_no);
             seek_valid_record(in_fp, &byte_no, time_travel, last_valid_record, &record, err_fp);
         }
@@ -82,14 +82,14 @@ int main(int argc, char *argv[]) {
     }
     if(ferror(in_fp)) {
         error("a read error occurred at or around byte %i\n", byte_no);
-        errors++;
+        rc = 1;
     }
 
     /* Tidy up and exit */
-    errors += flush_and_close_files(in_file, in_fp, out_file, out_fp, err_file, err_fp);
-    errors += check_out_file_size(out_file);
+    rc |= flush_and_close_files(in_file, in_fp, out_file, out_fp, err_file, err_fp);
+    rc |= check_out_file_size(out_file);
 
-    return errors;
+    return rc;
 
 }
 
@@ -127,7 +127,7 @@ void seek_valid_record(FILE *in_fp, int *byte_no, int time_travel, struct futmpx
             debug("Found valid record at byte %i\n\n", *byte_no);
             if(0 != fseek(in_fp, -RECORD_LENGTH, SEEK_CUR)) {
                 error("fseek() failed on intput file (errno=%i)\n", errno);
-                exit(2); /* XXX */
+                exit(2);
             }
             break;
         }
@@ -173,7 +173,7 @@ void parse_args(int argc, char **argv, char **out_file, char **err_file, int *ti
         case 't':
             for(p = optarg; *p; p++) {
                 if(*p < '0' || *p > '9') {
-                    error("Argument to -t must be an integer\n");
+                    error("argument to -t must be an integer\n");
                     exit(2);
                 }
             }
@@ -229,7 +229,7 @@ void open_file(char *filename, FILE **fp, char *mode, char *type) {
     if(filename) {
         if(NULL == (*fp = fopen(filename, mode))) {
             error("failed to open to open %s file %s (errno=%i)\n", type, filename, errno);
-            exit(1);
+            exit(2);
         }
     }
 
@@ -238,7 +238,7 @@ void open_file(char *filename, FILE **fp, char *mode, char *type) {
 /*
  *  flush_and_close_files()
  *  Flush, sync and close the input, output and error files.
- *  Returns 0 if all operations are successful, otherwise >0.
+ *  Returns 0 if all operations are successful, 1 otherwise.
  */
 int flush_and_close_files(
         char *in_file, FILE *in_fp,
@@ -246,8 +246,8 @@ int flush_and_close_files(
         char *err_file, FILE *err_fp) {
 
     return(
-            flush_and_close_file(in_file, in_fp, "input") + 
-            flush_and_close_file(out_file, out_fp, "output") +
+            flush_and_close_file(in_file, in_fp, "input") |
+            flush_and_close_file(out_file, out_fp, "output") |
             flush_and_close_file(err_file, err_fp, "error")
           );
 
@@ -257,29 +257,29 @@ int flush_and_close_files(
  * flush_and_close_file()
  * Flush, sync and close the given file. The type string (input,
  * output or error) is used in error messages.
- * Returns 0 if all operations are successful, otherwise >0.
+ * Returns 0 if all operations are successful, 1 otherwise.
  *
  */
 int flush_and_close_file(char *filename, FILE *fp, char *type) {
 
-    int errors = 0;
+    int rc = 0;
 
     if(fp) {
         if(0 != fflush(fp)) {
             error("fflush() of %s file %s failed (errno=%i)\n", type, filename, errno);
-            errors++;
+            rc = 1;
         }
         if(0 != fsync(fileno(fp))) {
             error("fsync() of %s file %s failed (errno=%i)\n", type, filename, errno);
-            errors++;
+            rc = 1;
         }
         if(0 != fclose(fp)) {
             error("fclose() of %s file %s failed (errno=%i)\n", type, filename, errno);
-            errors++;
+            rc = 1;
         }
     }
 
-    return errors;
+    return rc;
 
 }
 

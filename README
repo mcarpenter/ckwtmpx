@@ -99,11 +99,13 @@ OPTIONS
 
 
 RETURN VALUE
-     Returns 0 if the wtmpx file is okay, non-zero otherwise,  so
-     ckwtmpx  can be run with no arguments for testing file vali-
-     dity without spurious output:
+     Returns 0 if the wtmpx file is okay, 1 if it is corrupt  and
+     2 on fatal errors (syntax, file permissions, ...) so ckwtmpx
+     can be run with  no  arguments  for  testing  file  validity
+     without spurious output:
 
-         if ! ckwtmpx </var/adm/wtmpx
+         if ! ckwtmpx </var/adm/wtmpx ; then
+             ...
 
 
 
@@ -120,8 +122,6 @@ EXAMPLES
 
 
 AUTHOR
-     Martin Carpenter, mcarpenter@free.fr, Copyright 2010.
-
 
 
 
@@ -137,15 +137,15 @@ User Commands                                          ckwtmpx(1)
 
 
 
+     Martin Carpenter, mcarpenter@free.fr, Copyright 2010.
+
+
 FILES
      /var/adm/wtmpx    accounting file
 
 
 SEE ALSO
      last(1), utmpx(4)
-
-
-
 
 
 

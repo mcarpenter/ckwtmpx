@@ -121,11 +121,13 @@ Print version to stdout and exit.
 .SH RETURN VALUE
 .sp
 .LP
-Returns 0 if the \fBwtmpx\fR file is okay, non-zero otherwise, so \fBckwtmpx\fR can be run
+Returns 0 if the \fBwtmpx\fR file is okay, 1 if it is corrupt and 2 on
+fatal errors (syntax, file permissions, ...) so \fBckwtmpx\fR can be run
 with no arguments for testing file validity without spurious output:
 .sp
 .in +4
-if ! ckwtmpx </var/adm/wtmpx
+if ! ckwtmpx </var/adm/wtmpx ; then
+    ...
 .in -4
 .sp
 
