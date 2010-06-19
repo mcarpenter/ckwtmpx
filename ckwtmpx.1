@@ -1,6 +1,6 @@
 '\" te
 .\" Copyright 2010 Martin Carpenter, mcarpenter@free.fr.
-.TH ckwtmpx 1 "14 Apr 2010" "SunOS 5.10" "User Commands"
+.TH ckwtmpx 1 "19 Jun 2010" "SunOS 5.10" "User Commands"
 .SH NAME
 ckwtmpx \- check Solaris wtmpx files for corruption, and perform optional repairs.
 
@@ -44,7 +44,8 @@ The \fBwtmpx\fR record type (ut_type) is valid.
 .sp
 Either this is the first valid record found or it is not more than
 70 seconds younger than the previous record found. (Some systems may
-buffer output to \fBwtmpx\fR resulting occasional temporal misordering of records).
+buffer output to \fBwtmpx\fR resulting occasional temporal misordering of
+records, see the \fB-t\fR flag below).
 .in -4
 .sp
 See \fB<utmpx.h>\fR and \fB<utmp.h>\fR for more details on the binary record format,
@@ -105,6 +106,21 @@ Writes skipped bytes from the corrected \fBwtmpx\fR file to \fIerror_file\fR.
 .RS 25n
 .rt  
 Writes the corrected \fBwtmpx\fR file to \fIoutput_file\fR.
+.RE
+
+.sp
+.ne 2
+.mk
+.na
+\fB\fB-t\fR \fItime_travel\fR\fR
+.ad
+.RS 25n
+.rt
+Specifies the number of seconds by which a record may be younger
+than its predecessor and still be considered valid. One might expect
+that records would be written in strict chronological order but this
+is not so. The default of 70 seconds seems appropriate for most
+cases.
 .RE
 
 .sp

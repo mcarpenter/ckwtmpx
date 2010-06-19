@@ -51,7 +51,8 @@ DESCRIPTION
          Either this is the first valid record found or it is not
          more  than  70  seconds younger than the previous record
          found. (Some systems may buffer output to wtmpx  result-
-         ing occasional temporal misordering of records).
+         ing  occasional temporal misordering of records, see the
+         -t flag below).
 
      See <utmpx.h> and <utmp.h> for more details  on  the  binary
      record  format, in particular struct futmpx in <utmpx.h> for
@@ -59,8 +60,7 @@ DESCRIPTION
 
 
 
-
-SunOS 5.10          Last change: 14 Apr 2010                    1
+SunOS 5.10          Last change: 19 Jun 2010                    1
 
 
 
@@ -95,6 +95,17 @@ OPTIONS
                               output_file.
 
 
+     -t time_travel           Specifies the number of seconds  by
+                              which  a record may be younger than
+                              its predecessor and still  be  con-
+                              sidered  valid.  One  might  expect
+                              that records would  be  written  in
+                              strict chronological order but this
+                              is not the case. The default is  70
+                              seconds which seems appropriate for
+                              most cases.
+
+
      -v                       Print version to stdout and exit.
 
 
@@ -112,21 +123,10 @@ RETURN VALUE
 EXAMPLES
          ckwtmpx -e /tmp/err -o /tmp/out </var/adm/wtmpx
 
-     Writes corrected binary file to /tmp/out and  skipped  bytes
-     to /tmp/err.
-
-         ckwtmpx -d </var/adm/wtmpx
-
-     Writes  debug  information  (details  of  each  record   and
-     skip/seek attempts) to stderr.
-
-
-AUTHOR
 
 
 
-
-SunOS 5.10          Last change: 14 Apr 2010                    2
+SunOS 5.10          Last change: 19 Jun 2010                    2
 
 
 
@@ -137,6 +137,16 @@ User Commands                                          ckwtmpx(1)
 
 
 
+     Writes corrected binary file to /tmp/out and  skipped  bytes
+     to /tmp/err.
+
+         ckwtmpx -d </var/adm/wtmpx
+
+     Writes  debug  information  (details  of  each  record   and
+     skip/seek attempts) to stderr.
+
+
+AUTHOR
      Martin Carpenter, mcarpenter@free.fr, Copyright 2010.
 
 
@@ -182,17 +192,7 @@ SEE ALSO
 
 
 
-
-
-
-
-
-
-
-
-
-
-SunOS 5.10          Last change: 14 Apr 2010                    3
+SunOS 5.10          Last change: 19 Jun 2010                    3
 
 
 
