@@ -14,7 +14,7 @@ SRC=ckwtmpx.c
 
 .PHONY: all
 all: $(EXE) README
-	
+
 $(EXE): $(SRC) Makefile
 	$(CC) -o $(EXE) $(CFLAGS) $(SRC)
 

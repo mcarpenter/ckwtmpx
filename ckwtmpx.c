@@ -187,7 +187,7 @@ void parse_args(int argc, char **argv, char **out_file, char **err_file, int *ti
             errors++;
             break;
         }
-    
+
     }
 
     if(optind != argc) {
@@ -312,11 +312,11 @@ int is_record_valid(struct futmpx last_valid_record, struct futmpx record, int t
 
     return(
         /* It's no longer 1970: */
-        (record.ut_tv.tv_sec > 0) && 
+        (record.ut_tv.tv_sec > 0) &&
         /* Record was written before now: */
         (record.ut_tv.tv_sec < time(0)) &&
         /* Record has valid type: */
-        (record.ut_type >=0) && 
+        (record.ut_type >=0) &&
         (record.ut_type <= UTMAXTYPE) &&
         (
             /* We haven't got a first valid record yet: */
