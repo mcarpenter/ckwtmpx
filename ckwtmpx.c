@@ -126,7 +126,7 @@ void seek_valid_record(FILE *in_fp, int *byte_no, int time_travel, struct futmpx
             debug("Seeked past %i bytes\n", *byte_no - initial_byte_no);
             debug("Found valid record at byte %i\n\n", *byte_no);
             if(0 != fseek(in_fp, -RECORD_LENGTH, SEEK_CUR)) {
-                error("fseek() failed on intput file (errno=%i)\n", errno);
+                error("fseek() failed on input file (errno=%i)\n", errno);
                 exit(2);
             }
             break;
